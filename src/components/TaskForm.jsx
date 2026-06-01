@@ -68,7 +68,6 @@ function TaskForm({ onAddTask }) {
 
     // Création d'un nouvel objet tâche avec un identifiant unique
     const nouvelleTache = {
-      id: Date.now(),
       titre: formData.titre.trim(),
       description: formData.description.trim(),
       statut: formData.statut,

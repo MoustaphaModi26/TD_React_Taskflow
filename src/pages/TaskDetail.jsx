@@ -1,5 +1,10 @@
+// pages/TaskDetail.jsx
+// VERSION FULL-STACK : récupère la tâche depuis le backend via son _id MongoDB
+
 import { useParams, Link } from 'react-router-dom'
-import useLocalStorage from '../hooks/useLocalStorage.js'
+import { useState, useEffect } from 'react'
+
+const API_URL = 'http://localhost:5000/api/tasks'
 
 const statutConfig = {
   'A faire': { couleur: '#f39c12', fond: '#fff8e7'},
@@ -69,19 +74,35 @@ const styles = {
 }
 
 function TaskDetail() {
-
+  // useParams() extrait le ":id" de l'URL (ex: /task/abc123 → id = "abc123")
   const { id } = useParams()
 
+  const [tache, setTache] = useState(null)
+  const [chargement, setChargement] = useState(true)
 
-  const [tasks] = useLocalStorage('taskflow_data', [])
+  // On récupère TOUTES les tâches puis on cherche celle qui correspond à l'id
+  useEffect(() => {
+    fetch(API_URL)
+      .then((response) => response.json())
+      .then((data) => {
+        // MongoDB utilise "_id" (string), donc on compare directement avec id
+        const trouvee = data.find((t) => t._id === id)
+        setTache(trouvee)
+        setChargement(false)
+      })
+      .catch((error) => {
+        console.error('Erreur :', error)
+        setChargement(false)
+      })
+  }, [id])
 
-  const tache = tasks.find((t) => t.id === Number(id))
+  if (chargement) {
+    return <div style={styles.page}>Chargement...</div>
+  }
 
-  // Cas où la tâche n'est pas trouvée
   if (!tache) {
     return (
       <div style={styles.page}>
-
         <Link to="/" style={styles.retour}>← Retour au tableau de bord</Link>
         <div style={styles.erreur}>
           Tâche introuvable. Elle a peut-être été supprimée.
@@ -90,19 +111,15 @@ function TaskDetail() {
     )
   }
 
-  const config = statutConfig[tache.statut]
-
   return (
     <div style={styles.page}>
       <Link to="/" style={styles.retour}>← Retour au tableau de bord</Link>
 
       <div style={styles.carte}>
-        <div style={styles.titre}>
-          {config.emoji} {tache.titre}
-        </div>
+        <div style={styles.titre}>{tache.titre}</div>
 
         <div style={styles.label}>Identifiant</div>
-        <div style={styles.valeur}>#{tache.id}</div>
+        <div style={styles.valeur}>#{tache._id}</div>
 
         <div style={styles.label}>Description</div>
         <div style={styles.valeur}>{tache.description || 'Aucune description fournie.'}</div>

@@ -1,6 +1,9 @@
+// components/TaskCard.jsx
+// Affiche une carte pour chaque tâche
+// MODIFICATION : on utilise tache._id (identifiant MongoDB) au lieu de tache.id
+
 import { Link } from 'react-router-dom'
 
-// Couleurs associées à chaque statut de tâche
 const statutConfig = {
   'A faire': { couleur: '#f39c12', fond: '#fff8e7'},
   'En cours': { couleur: '#3498db', fond: '#e8f4fd'},
@@ -14,7 +17,6 @@ const styles = {
     borderRadius: '12px',
     padding: '1.25rem',
     boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-    
     cursor: 'pointer',
     textDecoration: 'none',
     display: 'block',
@@ -31,7 +33,6 @@ const styles = {
     color: '#666',
     marginBottom: '1rem',
     lineHeight: '1.4',
-    // Tronquer le texte si trop long
     overflow: 'hidden',
     display: '-webkit-box',
     WebkitLineClamp: 2,
@@ -50,19 +51,14 @@ const styles = {
 }
 
 function TaskCard({ tache }) {
-  const config = statutConfig[tache.statut]
-
   return (
-  
+    // tache._id = l'identifiant unique généré par MongoDB
+    // C'est une chaîne de caractères comme "684f2a3b1c9e4d0012345678"
     <Link
-      to={`/task/${tache.id}`}
+      to={`/task/${tache._id}`}
       style={styles.card}
-      
-    
     >
-      <div style={styles.titre}>
-        {config.emoji} {tache.titre}
-      </div>
+      <div style={styles.titre}>{tache.titre}</div>
       <div style={styles.description}>{tache.description}</div>
       <span style={styles.badge(tache.statut)}>{tache.statut}</span>
     </Link>
